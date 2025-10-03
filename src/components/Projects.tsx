@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink, Github } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import snakeGameThumbnail from "@/assets/snake-game-thumbnail.png";
+import interviewChatbotThumbnail from "@/assets/interview-chatbot-thumbnail.png";
 import project2 from "@/assets/project-2.png";
 import project3 from "@/assets/project-3.png";
 import project4 from "@/assets/project-4.png";
@@ -31,6 +32,15 @@ const Projects = () => {
     },
     {
       id: 2,
+      title: "AI Interview Coach",
+      description: "Conversational AI-powered interview preparation tool with voice and text input. Features real-time feedback, performance scoring, and up to 5 Q&A rounds to help you ace your next job interview.",
+      image: interviewChatbotThumbnail,
+      tech: ["Python", "Streamlit", "OpenAI", "Speech AI"],
+      github: "https://github.com/YevhenUa-no/chat_bots",
+      live: "https://chatbots-interview.streamlit.app/"
+    },
+    {
+      id: 3,
       title: "Next-Level Gaming UI",
       description: "Advanced gaming interface design with smooth animations and user-centric layouts.",
       image: project2,
@@ -39,7 +49,7 @@ const Projects = () => {
       live: "#"
     },
     {
-      id: 3,
+      id: 4,
       title: "3D Portfolio",
       description: "Modern portfolio website featuring 3D elements and interactive components.",
       image: project3,
@@ -48,7 +58,7 @@ const Projects = () => {
       live: "#"
     },
     {
-      id: 4,
+      id: 5,
       title: "Gaming Website",
       description: "Complete gaming platform with character management and interactive features.",
       image: project4,
@@ -57,7 +67,7 @@ const Projects = () => {
       live: "#"
     },
     {
-      id: 5,
+      id: 6,
       title: "Web Animation Tools",
       description: "Comprehensive guide and tools for modern web animations and interactions.",
       image: project5,
@@ -66,7 +76,7 @@ const Projects = () => {
       live: "#"
     },
     {
-      id: 6,
+      id: 7,
       title: "Portfolio Tutorial",
       description: "Step-by-step animated portfolio creation tutorial with modern design principles.",
       image: project6,
