@@ -3,6 +3,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Github } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import project1 from "@/assets/project-1.png";
 import project2 from "@/assets/project-2.png";
 import project3 from "@/assets/project-3.png";
@@ -16,16 +17,17 @@ const Projects = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const projects = [
     {
       id: 1,
-      title: "3D Interactive Web",
-      description: "Create stunning 3D interactive web experiences with modern tools and frameworks.",
+      title: "Retro Snake Game",
+      description: "Classic snake game with modern animations and retro aesthetics built with React.",
       image: project1,
-      tech: ["React", "Three.js", "GSAP", "WebGL"],
+      tech: ["React", "Canvas", "TypeScript", "Game Dev"],
       github: "#",
-      live: "#"
+      live: "/snake-game"
     },
     {
       id: 2,
@@ -159,6 +161,7 @@ const Projects = () => {
                       size="sm" 
                       variant="secondary"
                       className="bg-matrix-dark/80 backdrop-blur-sm border-neon-green/50 hover:border-neon-green"
+                      onClick={() => window.open(project.github, '_blank')}
                     >
                       <Github className="w-4 h-4 mr-2" />
                       Code
@@ -166,6 +169,13 @@ const Projects = () => {
                     <Button 
                       size="sm"
                       className="bg-gradient-primary text-primary-foreground hover:shadow-neon"
+                      onClick={() => {
+                        if (project.live.startsWith('/')) {
+                          navigate(project.live);
+                        } else {
+                          window.open(project.live, '_blank');
+                        }
+                      }}
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />
                       Live
