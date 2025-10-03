@@ -29,7 +29,9 @@ const SnakeGame = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const size = Math.min(window.innerWidth * 0.8, window.innerHeight * 0.6, 500);
+    const isMobile = window.innerWidth < 768;
+    const maxSize = isMobile ? Math.min(window.innerWidth - 32, window.innerHeight * 0.5) : 500;
+    const size = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.6, maxSize);
     const adjustedSize = size - (size % gridSize);
     canvas.width = adjustedSize;
     canvas.height = adjustedSize;
@@ -230,6 +232,46 @@ const SnakeGame = () => {
     }
   };
 
+  // Touch/Swipe controls for mobile
+  const touchStartRef = useRef({ x: 0, y: 0 });
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY
+    };
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!gameStarted || isGameOver) return;
+    e.preventDefault();
+
+    const touchEndX = e.touches[0].clientX;
+    const touchEndY = e.touches[0].clientY;
+
+    const dx = touchEndX - touchStartRef.current.x;
+    const dy = touchEndY - touchStartRef.current.y;
+
+    const sensitivity = 30;
+    const { direction } = gameStateRef.current;
+
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > sensitivity) {
+      if (dx > 0 && direction.x === 0) {
+        gameStateRef.current.direction = { x: 1, y: 0 };
+      } else if (dx < 0 && direction.x === 0) {
+        gameStateRef.current.direction = { x: -1, y: 0 };
+      }
+    } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > sensitivity) {
+      if (dy > 0 && direction.y === 0) {
+        gameStateRef.current.direction = { x: 0, y: 1 };
+      } else if (dy < 0 && direction.y === 0) {
+        gameStateRef.current.direction = { x: 0, y: -1 };
+      }
+    }
+
+    touchStartRef.current = { x: touchEndX, y: touchEndY };
+  };
+
   useEffect(() => {
     setupCanvas();
     window.addEventListener('resize', setupCanvas);
@@ -243,51 +285,56 @@ const SnakeGame = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-matrix-dark via-matrix-dark to-background p-4 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-matrix-dark via-matrix-dark to-background p-4 py-8 md:p-4 relative overflow-hidden">
       {/* Back Button */}
       <Button
         onClick={() => navigate('/')}
         variant="ghost"
-        className="absolute top-4 left-4 text-neon-green hover:bg-neon-green/10"
+        size="sm"
+        className="absolute top-2 left-2 md:top-4 md:left-4 text-neon-green hover:bg-neon-green/10 z-10"
       >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Portfolio
+        <ArrowLeft className="w-4 h-4 md:mr-2" />
+        <span className="hidden md:inline">Back to Portfolio</span>
       </Button>
 
       {/* Title */}
-      <div className="text-center mb-6">
-        <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-neon-green to-emerald-400 bg-clip-text text-transparent">
+      <div className="text-center mb-4 md:mb-6">
+        <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-neon-green to-emerald-400 bg-clip-text text-transparent">
           RETRO SNAKE
         </h1>
-        <p className="text-sm text-muted-foreground mt-2">Classic arcade gaming with modern style!</p>
+        <p className="text-xs md:text-sm text-muted-foreground mt-2">
+          {window.innerWidth < 768 ? 'Swipe or tap buttons to play!' : 'Classic arcade gaming with modern style!'}
+        </p>
       </div>
 
       {/* Canvas */}
       <canvas
         ref={canvasRef}
-        className="bg-matrix-dark/80 border-3 border-neon-green rounded-xl shadow-glow mb-4"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        className="bg-matrix-dark/80 border-2 md:border-3 border-neon-green rounded-lg md:rounded-xl shadow-glow mb-3 md:mb-4 touch-none"
         style={{ boxShadow: '0 0 30px rgba(16, 185, 129, 0.6), inset 0 0 20px rgba(16, 185, 129, 0.1)' }}
       />
 
       {/* Score Display */}
-      <div className="text-center text-2xl font-bold mb-4" style={{ textShadow: '0 0 10px rgba(16, 185, 129, 0.8)' }}>
+      <div className="text-center text-lg md:text-2xl font-bold mb-2 md:mb-4" style={{ textShadow: '0 0 10px rgba(16, 185, 129, 0.8)' }}>
         <span className="text-neon-green">Score: {score}</span>
-        <span className="mx-4 text-muted-foreground">|</span>
-        <span className="text-emerald-400">High Score: {highScore}</span>
+        <span className="mx-2 md:mx-4 text-muted-foreground">|</span>
+        <span className="text-emerald-400">High: {highScore}</span>
       </div>
 
-      {/* Controls Info */}
-      <p className="text-sm text-muted-foreground mb-4">
+      {/* Controls Info - Desktop only */}
+      <p className="hidden md:block text-sm text-muted-foreground mb-4">
         Use arrow keys or WASD to control • Collect red food to grow
       </p>
 
       {/* Game Over Message */}
       {isGameOver && (
-        <div className="glass-card p-8 border-red-500 text-center mb-4 animate-fade-in">
-          <h2 className="text-3xl font-bold text-red-500 mb-2" style={{ textShadow: '0 0 15px #ef4444' }}>
+        <div className="glass-card p-4 md:p-8 border-red-500 text-center mb-3 md:mb-4 animate-fade-in max-w-sm">
+          <h2 className="text-2xl md:text-3xl font-bold text-red-500 mb-2" style={{ textShadow: '0 0 15px #ef4444' }}>
             GAME OVER!
           </h2>
-          <p className="text-xl text-muted-foreground">Final Score: {score}</p>
+          <p className="text-lg md:text-xl text-muted-foreground">Final Score: {score}</p>
         </div>
       )}
 
@@ -295,36 +342,41 @@ const SnakeGame = () => {
       {!gameStarted && (
         <Button
           onClick={startGame}
-          className="bg-gradient-primary text-primary-foreground hover:shadow-glow transition-all duration-300 text-lg px-8 py-4 rounded-full font-bold uppercase tracking-wide pulse-glow"
+          size="lg"
+          className="bg-gradient-primary text-primary-foreground hover:shadow-glow transition-all duration-300 text-base md:text-lg px-6 md:px-8 py-3 md:py-4 rounded-full font-bold uppercase tracking-wide pulse-glow mb-4 md:mb-0"
         >
           {isGameOver ? 'PLAY AGAIN' : 'START GAME'}
         </Button>
       )}
 
       {/* Mobile Controls */}
-      <div className="md:hidden mt-8 flex flex-col items-center gap-2">
+      <div className="md:hidden mt-4 flex flex-col items-center gap-2">
         <Button
           onClick={() => handleControlClick('up')}
-          className="w-16 h-16 text-2xl bg-neon-green/20 border-2 border-neon-green hover:bg-neon-green/40"
+          size="lg"
+          className="w-14 h-14 text-2xl bg-neon-green/20 border-2 border-neon-green hover:bg-neon-green/40 active:scale-95 transition-transform"
         >
           ▲
         </Button>
         <div className="flex gap-2">
           <Button
             onClick={() => handleControlClick('left')}
-            className="w-16 h-16 text-2xl bg-neon-green/20 border-2 border-neon-green hover:bg-neon-green/40"
+            size="lg"
+            className="w-14 h-14 text-2xl bg-neon-green/20 border-2 border-neon-green hover:bg-neon-green/40 active:scale-95 transition-transform"
           >
             ◀
           </Button>
           <Button
             onClick={() => handleControlClick('down')}
-            className="w-16 h-16 text-2xl bg-neon-green/20 border-2 border-neon-green hover:bg-neon-green/40"
+            size="lg"
+            className="w-14 h-14 text-2xl bg-neon-green/20 border-2 border-neon-green hover:bg-neon-green/40 active:scale-95 transition-transform"
           >
             ▼
           </Button>
           <Button
             onClick={() => handleControlClick('right')}
-            className="w-16 h-16 text-2xl bg-neon-green/20 border-2 border-neon-green hover:bg-neon-green/40"
+            size="lg"
+            className="w-14 h-14 text-2xl bg-neon-green/20 border-2 border-neon-green hover:bg-neon-green/40 active:scale-95 transition-transform"
           >
             ▶
           </Button>
