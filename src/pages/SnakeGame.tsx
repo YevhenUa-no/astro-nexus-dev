@@ -175,34 +175,39 @@ const SnakeGame = () => {
     gameStateRef.current.gameLoop = setInterval(gameTick, 120);
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (!gameStarted || isGameOver) return;
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!gameStarted || isGameOver) return;
 
-    const { direction } = gameStateRef.current;
+      const { direction } = gameStateRef.current;
 
-    switch (e.key) {
-      case 'ArrowUp':
-      case 'w':
-      case 'W':
-        if (direction.y === 0) gameStateRef.current.direction = { x: 0, y: -1 };
-        break;
-      case 'ArrowDown':
-      case 's':
-      case 'S':
-        if (direction.y === 0) gameStateRef.current.direction = { x: 0, y: 1 };
-        break;
-      case 'ArrowLeft':
-      case 'a':
-      case 'A':
-        if (direction.x === 0) gameStateRef.current.direction = { x: -1, y: 0 };
-        break;
-      case 'ArrowRight':
-      case 'd':
-      case 'D':
-        if (direction.x === 0) gameStateRef.current.direction = { x: 1, y: 0 };
-        break;
-    }
-  };
+      switch (e.key) {
+        case 'ArrowUp':
+        case 'w':
+        case 'W':
+          if (direction.y === 0) gameStateRef.current.direction = { x: 0, y: -1 };
+          break;
+        case 'ArrowDown':
+        case 's':
+        case 'S':
+          if (direction.y === 0) gameStateRef.current.direction = { x: 0, y: 1 };
+          break;
+        case 'ArrowLeft':
+        case 'a':
+        case 'A':
+          if (direction.x === 0) gameStateRef.current.direction = { x: -1, y: 0 };
+          break;
+        case 'ArrowRight':
+        case 'd':
+        case 'D':
+          if (direction.x === 0) gameStateRef.current.direction = { x: 1, y: 0 };
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [gameStarted, isGameOver]);
 
   const handleControlClick = (dir: string) => {
     if (!gameStarted || isGameOver) return;
@@ -228,16 +233,14 @@ const SnakeGame = () => {
   useEffect(() => {
     setupCanvas();
     window.addEventListener('resize', setupCanvas);
-    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('resize', setupCanvas);
-      document.removeEventListener('keydown', handleKeyDown);
       if (gameStateRef.current.gameLoop) {
         clearInterval(gameStateRef.current.gameLoop);
       }
     };
-  }, [gameStarted, isGameOver]);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-matrix-dark via-matrix-dark to-background p-4 relative">
