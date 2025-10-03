@@ -4,7 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Github } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import project1 from "@/assets/project-1.png";
+import snakeGameThumbnail from "@/assets/snake-game-thumbnail.png";
 import project2 from "@/assets/project-2.png";
 import project3 from "@/assets/project-3.png";
 import project4 from "@/assets/project-4.png";
@@ -24,7 +24,7 @@ const Projects = () => {
       id: 1,
       title: "Retro Snake Game",
       description: "Classic snake game with modern animations and retro aesthetics built with React.",
-      image: project1,
+      image: snakeGameThumbnail,
       tech: ["React", "Canvas", "TypeScript", "Game Dev"],
       github: "#",
       live: "/snake-game"
