@@ -77,9 +77,9 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { icon: Github, href: "https://github.com", label: "GitHub" },
-    { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-    { icon: Mail, href: "mailto:hello@yevhen.dev", label: "Email" }
+    { icon: Github, href: "https://github.com/YevhenUa-no", label: "GitHub" },
+    { icon: Linkedin, href: "https://www.linkedin.com/in/yevhen-riabtsun/", label: "LinkedIn" },
+    { icon: Mail, href: "mailto:evgenii.ryabtsun@gmail.com", label: "Email" }
   ];
 
   return (
@@ -152,7 +152,7 @@ const Footer = () => {
             <div className="space-y-4">
               <h4 className="text-xl font-semibold text-neon-green">Get In Touch</h4>
               <div className="space-y-2 text-muted-foreground">
-                <p>hello@yevhen.dev</p>
+                <p>evgenii.ryabtsun@gmail.com</p>
                 <p>+1 (555) 123-4567</p>
                 <p>Oslo, Norway</p>
               </div>

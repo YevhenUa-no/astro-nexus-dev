@@ -61,14 +61,20 @@ const Navigation = () => {
               
               {/* Social Links */}
               <div className="flex items-center space-x-4 ml-8">
-                <Button variant="ghost" size="icon" className="hover:text-neon-green">
-                  <Github className="w-5 h-5" />
+                <Button variant="ghost" size="icon" className="hover:text-neon-green" asChild>
+                  <a href="https://github.com/YevhenUa-no" target="_blank" rel="noopener noreferrer">
+                    <Github className="w-5 h-5" />
+                  </a>
                 </Button>
-                <Button variant="ghost" size="icon" className="hover:text-neon-green">
-                  <Linkedin className="w-5 h-5" />
+                <Button variant="ghost" size="icon" className="hover:text-neon-green" asChild>
+                  <a href="https://www.linkedin.com/in/yevhen-riabtsun/" target="_blank" rel="noopener noreferrer">
+                    <Linkedin className="w-5 h-5" />
+                  </a>
                 </Button>
-                <Button variant="ghost" size="icon" className="hover:text-neon-green">
-                  <Mail className="w-5 h-5" />
+                <Button variant="ghost" size="icon" className="hover:text-neon-green" asChild>
+                  <a href="mailto:evgenii.ryabtsun@gmail.com">
+                    <Mail className="w-5 h-5" />
+                  </a>
                 </Button>
               </div>
               
@@ -125,14 +131,20 @@ const Navigation = () => {
               
               <div className="pt-6 border-t border-border">
                 <div className="flex justify-center space-x-6 mb-6">
-                  <Button variant="ghost" size="icon" className="hover:text-neon-green">
-                    <Github className="w-6 h-6" />
+                  <Button variant="ghost" size="icon" className="hover:text-neon-green" asChild>
+                    <a href="https://github.com/YevhenUa-no" target="_blank" rel="noopener noreferrer">
+                      <Github className="w-6 h-6" />
+                    </a>
                   </Button>
-                  <Button variant="ghost" size="icon" className="hover:text-neon-green">
-                    <Linkedin className="w-6 h-6" />
+                  <Button variant="ghost" size="icon" className="hover:text-neon-green" asChild>
+                    <a href="https://www.linkedin.com/in/yevhen-riabtsun/" target="_blank" rel="noopener noreferrer">
+                      <Linkedin className="w-6 h-6" />
+                    </a>
                   </Button>
-                  <Button variant="ghost" size="icon" className="hover:text-neon-green">
-                    <Mail className="w-6 h-6" />
+                  <Button variant="ghost" size="icon" className="hover:text-neon-green" asChild>
+                    <a href="mailto:evgenii.ryabtsun@gmail.com">
+                      <Mail className="w-6 h-6" />
+                    </a>
                   </Button>
                 </div>
                 

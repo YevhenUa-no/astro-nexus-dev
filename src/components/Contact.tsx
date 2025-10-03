@@ -78,21 +78,21 @@ const Contact = () => {
   const socialLinks = [
     { 
       icon: Github, 
-      href: "https://github.com", 
+      href: "https://github.com/YevhenUa-no", 
       label: "GitHub",
-      username: "@yevhen-riabtsun"
+      username: "@YevhenUa-no"
     },
     { 
       icon: Linkedin, 
-      href: "https://linkedin.com", 
+      href: "https://www.linkedin.com/in/yevhen-riabtsun/", 
       label: "LinkedIn",
       username: "Yevhen Riabtsun"
     },
     { 
       icon: Mail, 
-      href: "mailto:hello@yevhen.dev", 
+      href: "mailto:evgenii.ryabtsun@gmail.com", 
       label: "Email",
-      username: "hello@yevhen.dev"
+      username: "evgenii.ryabtsun@gmail.com"
     }
   ];
 
@@ -174,7 +174,7 @@ const Contact = () => {
               <div className="space-y-6">
                 <div>
                   <p className="text-muted-foreground mb-2">Email</p>
-                  <p className="text-lg font-medium">hello@yevhen.dev</p>
+                  <p className="text-lg font-medium">evgenii.ryabtsun@gmail.com</p>
                 </div>
                 
                 <div>
