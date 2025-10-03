@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Volume2, VolumeX } from "lucide-react";
+import * as Tone from "tone";
 
 const SnakeGame = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -11,7 +12,22 @@ const SnakeGame = () => {
   });
   const [isGameOver, setIsGameOver] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [musicEnabled, setMusicEnabled] = useState(true);
   const navigate = useNavigate();
+
+  const audioRef = useRef({
+    mainSynth: null as Tone.Synth | null,
+    pointSynth: null as Tone.Synth | null,
+    buzzSynth: null as Tone.Synth | null,
+    mainLoop: null as Tone.Sequence | null,
+    initialized: false
+  });
+
+  // 8-bit song notes
+  const song = {
+    notes: ["C4", "E4", "G4", "A4", "G4", "E4", "C4", "F4", "A4", "G4", "F4", "E4", "C4"],
+    tempo: 90
+  };
 
   const gridSize = 20;
   const gameStateRef = useRef({
@@ -24,6 +40,115 @@ const SnakeGame = () => {
     gameLoop: null as NodeJS.Timeout | null,
     tileSize: 0
   });
+
+  const setupAudio = async () => {
+    if (audioRef.current.initialized) return;
+
+    try {
+      await Tone.start();
+
+      // Main melody synth
+      audioRef.current.mainSynth = new Tone.Synth({
+        oscillator: { 
+          type: "square8"
+        },
+        envelope: {
+          attack: 0.02,
+          decay: 0.1,
+          sustain: 0.3,
+          release: 0.8
+        }
+      }).chain(
+        new Tone.Filter(800, "lowpass"),
+        new Tone.Volume(-10),
+        Tone.getDestination()
+      );
+
+      // Point collection sound
+      audioRef.current.pointSynth = new Tone.Synth({
+        oscillator: { type: "triangle8" },
+        envelope: {
+          attack: 0.01,
+          decay: 0.1,
+          sustain: 0.05,
+          release: 0.1
+        }
+      }).chain(
+        new Tone.Volume(-8),
+        Tone.getDestination()
+      );
+
+      // Game over sound
+      audioRef.current.buzzSynth = new Tone.Synth({
+        oscillator: { type: "sawtooth4" },
+        envelope: {
+          attack: 0.01,
+          decay: 1.5,
+          sustain: 0,
+          release: 0.1
+        }
+      }).chain(
+        new Tone.Volume(-12),
+        Tone.getDestination()
+      );
+
+      audioRef.current.initialized = true;
+    } catch (error) {
+      console.error("Failed to initialize audio:", error);
+    }
+  };
+
+  const playBackgroundMusic = () => {
+    if (!musicEnabled || !audioRef.current.mainSynth) return;
+
+    if (audioRef.current.mainLoop) {
+      audioRef.current.mainLoop.dispose();
+    }
+
+    Tone.getTransport().bpm.value = song.tempo;
+
+    audioRef.current.mainLoop = new Tone.Sequence((time, note) => {
+      if (note && musicEnabled && audioRef.current.mainSynth) {
+        audioRef.current.mainSynth.triggerAttackRelease(note, "8n", time);
+      }
+    }, song.notes, "8n").start(0);
+
+    Tone.getTransport().start();
+  };
+
+  const stopBackgroundMusic = () => {
+    if (audioRef.current.mainLoop) {
+      audioRef.current.mainLoop.dispose();
+      audioRef.current.mainLoop = null;
+    }
+    Tone.getTransport().stop();
+  };
+
+  const playPointSound = () => {
+    if (!musicEnabled || !audioRef.current.pointSynth) return;
+    const pitches = ["C5", "D5", "E5", "F5", "G5"];
+    const randomPitch = pitches[Math.floor(Math.random() * pitches.length)];
+    audioRef.current.pointSynth.triggerAttackRelease(randomPitch, "16n");
+  };
+
+  const playGameOverSound = () => {
+    if (!musicEnabled || !audioRef.current.buzzSynth) return;
+    audioRef.current.buzzSynth.triggerAttackRelease("C2", "1n");
+  };
+
+  const toggleMusic = async () => {
+    if (!audioRef.current.initialized) {
+      await setupAudio();
+    }
+    
+    setMusicEnabled(!musicEnabled);
+    
+    if (!musicEnabled && gameStarted) {
+      playBackgroundMusic();
+    } else {
+      stopBackgroundMusic();
+    }
+  };
 
   const setupCanvas = () => {
     const canvas = canvasRef.current;
@@ -130,6 +255,9 @@ const SnakeGame = () => {
       gameStateRef.current.gameLoop = null;
     }
 
+    stopBackgroundMusic();
+    playGameOverSound();
+
     if (score > highScore) {
       setHighScore(score);
       localStorage.setItem('snakeHighScore', score.toString());
@@ -144,6 +272,7 @@ const SnakeGame = () => {
 
     if (head.x === food.x && head.y === food.y) {
       setScore(prev => prev + 1);
+      playPointSound();
       placeFood();
     } else {
       snake.pop();
@@ -157,7 +286,7 @@ const SnakeGame = () => {
     drawGame();
   };
 
-  const startGame = () => {
+  const startGame = async () => {
     setIsGameOver(false);
     setGameStarted(true);
     setScore(0);
@@ -175,6 +304,14 @@ const SnakeGame = () => {
     }
 
     gameStateRef.current.gameLoop = setInterval(gameTick, 120);
+
+    // Setup and play audio
+    if (!audioRef.current.initialized) {
+      await setupAudio();
+    }
+    if (musicEnabled) {
+      playBackgroundMusic();
+    }
   };
 
   useEffect(() => {
@@ -274,6 +411,7 @@ const SnakeGame = () => {
 
   useEffect(() => {
     setupCanvas();
+    setupAudio();
     window.addEventListener('resize', setupCanvas);
 
     return () => {
@@ -281,6 +419,7 @@ const SnakeGame = () => {
       if (gameStateRef.current.gameLoop) {
         clearInterval(gameStateRef.current.gameLoop);
       }
+      stopBackgroundMusic();
     };
   }, []);
 
@@ -295,6 +434,17 @@ const SnakeGame = () => {
       >
         <ArrowLeft className="w-4 h-4 md:mr-2" />
         <span className="hidden md:inline">Back to Portfolio</span>
+      </Button>
+
+      {/* Music Toggle */}
+      <Button
+        onClick={toggleMusic}
+        variant="ghost"
+        size="sm"
+        className="absolute top-2 right-2 md:top-4 md:right-4 text-neon-green hover:bg-neon-green/10 z-10"
+      >
+        {musicEnabled ? <Volume2 className="w-4 h-4 md:mr-2" /> : <VolumeX className="w-4 h-4 md:mr-2" />}
+        <span className="hidden md:inline">{musicEnabled ? 'Music On' : 'Music Off'}</span>
       </Button>
 
       {/* Title */}
